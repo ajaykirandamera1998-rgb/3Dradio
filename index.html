@@ -1,28 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,
+             initial-scale=1,
+             maximum-scale=1,
+             user-scalable=no,
+             viewport-fit=cover"
+  >
+
   <title>90's MACHINE - RETRO RADIO</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- STABLE LIBRARIES (A-Frame 1.4.2 + MindAR 1.2.2) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@500;600&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+
+  <!-- A-Frame Extras -->
+  <script
+    src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js">
+  </script>
+
+  <!-- MindAR -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js">
+  </script>
+
+  <!-- GSAP -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
   <style>
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       margin: 0;
@@ -31,381 +57,778 @@
       touch-action: none;
     }
 
+    /* =========================
+       CAMERA VIDEO
+    ========================= */
+
     video.mindar-video {
       position: fixed !important;
       inset: 0 !important;
+
       width: 100vw !important;
       height: 100vh !important;
+
       object-fit: cover !important;
+
       z-index: 0 !important;
+
       display: block !important;
+
       background: transparent !important;
     }
 
     canvas.mindar-canvas {
       position: fixed !important;
       inset: 0 !important;
+
       width: 100vw !important;
       height: 100vh !important;
+
       z-index: 1 !important;
+
       display: block !important;
+
       pointer-events: auto !important;
     }
 
-    a-scene, .a-canvas {
+    a-scene,
+    .a-canvas {
       position: fixed !important;
       inset: 0 !important;
+
       width: 100vw !important;
       height: 100vh !important;
+
       z-index: 2 !important;
+
       display: block !important;
+
       background: transparent !important;
+
       pointer-events: auto !important;
     }
 
-    .a-enter-vr, .a-enter-ar, .a-orientation-modal, .a-loader-title {
+    .a-enter-vr,
+    .a-enter-ar,
+    .a-orientation-modal,
+    .a-loader-title {
       display: none !important;
     }
 
-    /* ENTRY SCREEN */
+    /* =========================
+       ENTRY SCREEN
+    ========================= */
+
     #entry-screen {
       position: fixed;
       inset: 0;
+
       z-index: 100;
-      overflow: hidden;
+
       display: flex;
+
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
       padding: 24px;
+
       text-align: center;
+
       background: #f2e6c9;
+
+      overflow: hidden;
     }
-    #entry-screen.hidden { display: none; }
+
+    #entry-screen.hidden {
+      display: none;
+    }
 
     #entry-sunburst {
       position: absolute;
+
       top: 50%;
       left: 50%;
+
       width: 220vw;
       height: 220vw;
+
       border-radius: 50%;
+
       transform: translate(-50%, -50%);
-      background: repeating-conic-gradient(#1b6b67 0deg 9deg, #7a2426 9deg 18deg);
+
+      background:
+        repeating-conic-gradient(
+          #1b6b67 0deg 9deg,
+          #7a2426 9deg 18deg
+        );
+
       opacity: 0.18;
     }
 
     #entry-title {
       position: relative;
+
       margin: 0;
+
       color: #7a2426;
+
       font-family: "Baloo 2", sans-serif;
+
       font-size: clamp(38px, 12vw, 60px);
+
       font-weight: 800;
+
       letter-spacing: 1px;
+
       line-height: 0.95;
-      text-shadow: 4px 4px 0 #e8a62e, 7px 7px 0 #241a14;
+
+      text-shadow:
+        4px 4px 0 #e8a62e,
+        7px 7px 0 #241a14;
     }
 
     #entry-subtitle {
       position: relative;
+
       margin-top: 14px;
+
       padding: 7px 22px;
+
       border: 3px solid #241a14;
+
       border-radius: 999px;
+
       background: #1b6b67;
+
       color: #f7efd9;
+
       font-family: "Fredoka", sans-serif;
+
       font-size: 15px;
+
       font-weight: 600;
     }
 
     #entry-hint {
       position: relative;
-      max-width: 300px;
+
+      max-width: 320px;
+
       margin: 26px 0 0;
+
       color: #241a14;
+
       font-family: "Fredoka", sans-serif;
+
       font-size: 14px;
+
       line-height: 1.5;
+
       opacity: 0.8;
     }
 
     #entry-btn {
       position: relative;
+
       margin-top: 22px;
+
       padding: 14px 38px;
+
       border: 3px solid #241a14;
+
       border-radius: 999px;
+
       background: #e8a62e;
+
       color: #241a14;
+
       box-shadow: 4px 4px 0 #241a14;
+
       font-family: "Fredoka", sans-serif;
+
       font-size: 17px;
+
       font-weight: 600;
+
       cursor: pointer;
     }
+
     #entry-btn:active {
       transform: translate(3px, 3px);
+
       box-shadow: 1px 1px 0 #241a14;
     }
 
-    /* SCAN HUD */
+    #entry-btn:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    /* =========================
+       SCAN HUD
+    ========================= */
+
     #scan-hud {
       position: fixed;
       inset: 0;
+
       z-index: 45;
+
       display: flex;
+
       align-items: center;
       justify-content: center;
+
       pointer-events: none;
+
       opacity: 0;
+
       transition: opacity 0.35s ease;
     }
-    #scan-hud.visible { opacity: 1; }
+
+    #scan-hud.visible {
+      opacity: 1;
+    }
 
     #scan-frame {
       position: relative;
+
       width: 58vw;
+
       max-width: 320px;
+
       aspect-ratio: 1 / 1.15;
     }
 
     #scan-frame .corner {
       position: absolute;
+
       width: 34px;
       height: 34px;
+
       border: 4px solid #1b6b67;
+
       animation: scan-pulse 1.8s ease-in-out infinite;
     }
+
     @keyframes scan-pulse {
-      0%, 100% { opacity: 0.55; }
-      50% { opacity: 1; }
+
+      0%,
+      100% {
+        opacity: 0.55;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
     }
-    #scan-frame .tl { top: 0; left: 0; border-right: none; border-bottom: none; border-radius: 10px 0 0 0; }
-    #scan-frame .tr { top: 0; right: 0; border-bottom: none; border-left: none; border-radius: 0 10px 0 0; }
-    #scan-frame .bl { bottom: 0; left: 0; border-top: none; border-right: none; border-radius: 0 0 0 10px; }
-    #scan-frame .br { right: 0; bottom: 0; border-top: none; border-left: none; border-radius: 0 0 10px 0; }
+
+    #scan-frame .tl {
+      top: 0;
+      left: 0;
+
+      border-right: none;
+      border-bottom: none;
+
+      border-radius: 10px 0 0 0;
+    }
+
+    #scan-frame .tr {
+      top: 0;
+      right: 0;
+
+      border-bottom: none;
+      border-left: none;
+
+      border-radius: 0 10px 0 0;
+    }
+
+    #scan-frame .bl {
+      bottom: 0;
+      left: 0;
+
+      border-top: none;
+      border-right: none;
+
+      border-radius: 0 0 0 10px;
+    }
+
+    #scan-frame .br {
+      right: 0;
+      bottom: 0;
+
+      border-top: none;
+      border-left: none;
+
+      border-radius: 0 0 10px 0;
+    }
 
     #scan-hint {
       position: absolute;
+
       bottom: -44px;
       left: 50%;
+
       padding: 6px 16px;
+
       border-radius: 999px;
+
       transform: translateX(-50%);
+
       background: rgba(0, 0, 0, 0.58);
+
       color: #ffffff;
+
       font-family: "Fredoka", sans-serif;
+
       font-size: 14px;
+
       white-space: nowrap;
     }
 
-    /* RADIO PLAYER HUD */
+    /* =========================
+       RADIO HUD
+    ========================= */
+
     #radio-hud {
       position: fixed;
+
       bottom: 20px;
       left: 50%;
+
       transform: translateX(-50%);
+
       z-index: 80;
+
       width: 90%;
       max-width: 380px;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       gap: 10px;
+
       background: rgba(36, 26, 20, 0.92);
+
       border: 3px solid #e8a62e;
+
       border-radius: 20px;
+
       padding: 12px 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+
       pointer-events: auto;
+
       opacity: 0;
-      transition: opacity 0.35s ease, transform 0.35s ease;
-    }
-    #radio-hud.visible { 
-      opacity: 1; 
+
+      transition:
+        opacity 0.35s ease,
+        transform 0.35s ease;
     }
 
-    /* RADIO DIGITAL DISPLAY */
+    #radio-hud.visible {
+      opacity: 1;
+    }
+
     #radio-display {
       width: 100%;
+
       background: #0f1912;
+
       border: 2px solid #1b6b67;
+
       border-radius: 10px;
+
       padding: 6px 14px;
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
-      box-shadow: inset 0 0 8px rgba(0,255,150,0.2);
+
+      box-shadow:
+        inset 0 0 8px rgba(0, 255, 150, 0.2);
     }
 
     #freq-text {
       font-family: "Share Tech Mono", monospace;
+
       font-size: 22px;
+
       color: #4ef0a5;
+
       letter-spacing: 1px;
-      text-shadow: 0 0 8px rgba(78, 240, 165, 0.6);
+
+      text-shadow:
+        0 0 8px rgba(78, 240, 165, 0.6);
     }
 
     #station-name {
       font-family: "Fredoka", sans-serif;
+
       font-size: 12px;
+
       font-weight: 600;
+
       color: #e8a62e;
+
       text-transform: uppercase;
+
       letter-spacing: 0.5px;
     }
 
     #rotate-hint {
       font-family: "Fredoka", sans-serif;
+
       font-size: 11px;
+
       color: #f7efd9;
+
       opacity: 0.75;
-      margin: -2px 0 2px 0;
+
+      margin: -2px 0 2px;
     }
 
-    /* CONTROLS ROW */
     #controls-row {
       display: flex;
+
       align-items: center;
       justify-content: center;
+
       gap: 12px;
+
       width: 100%;
     }
 
     .radio-btn {
       display: flex;
+
       align-items: center;
       justify-content: center;
+
       border: 2px solid #241a14;
+
       border-radius: 50%;
+
       background: #f7efd9;
+
       color: #241a14;
+
       font-family: "Fredoka", sans-serif;
+
       font-weight: 600;
+
       cursor: pointer;
+
       box-shadow: 0 3px 0 #241a14;
-      transition: background 0.2s, transform 0.1s;
+
+      transition:
+        background 0.2s,
+        transform 0.1s;
     }
+
     .radio-btn:active {
       transform: translateY(2px);
+
       box-shadow: 0 1px 0 #241a14;
     }
 
     .btn-small {
       width: 42px;
       height: 42px;
+
       font-size: 14px;
-      background: #f7efd9;
     }
 
     .btn-large {
       width: 52px;
       height: 52px;
+
       font-size: 18px;
+
       background: #e8a62e;
     }
 
     .radio-btn.active {
       background: #1b6b67;
+
       color: #ffffff;
     }
 
+    /* =========================
+       ERROR
+    ========================= */
+
     #ar-error-toast {
       position: fixed;
+
       bottom: 26px;
       left: 50%;
+
       z-index: 110;
+
       display: none;
-      max-width: 86vw;
-      padding: 12px 18px;
+
+      width: min(90vw, 420px);
+
+      padding: 14px 18px;
+
       border-radius: 14px;
+
       transform: translateX(-50%);
-      background: rgba(20, 10, 8, 0.94);
+
+      background: rgba(20, 10, 8, 0.96);
+
       color: #f7efd9;
+
       font-family: "Fredoka", sans-serif;
+
       font-size: 13px;
+
       line-height: 1.5;
+
       text-align: center;
+
+      border: 2px solid #e8a62e;
     }
-    #ar-error-toast.visible { display: block; }
+
+    #ar-error-toast.visible {
+      display: block;
+    }
+
+    #error-close {
+      margin-top: 10px;
+
+      padding: 7px 16px;
+
+      border: 2px solid #e8a62e;
+
+      border-radius: 999px;
+
+      background: #e8a62e;
+
+      color: #241a14;
+
+      font-family: "Fredoka", sans-serif;
+
+      font-weight: 600;
+    }
+
+    /* =========================
+       AMBIENT
+    ========================= */
 
     #ambient-layer {
       position: fixed;
+
       inset: 0;
+
       z-index: 44;
+
       overflow: hidden;
+
       pointer-events: none;
     }
+
     .ambient-dot {
       position: absolute;
+
       width: 6px;
       height: 6px;
+
       border-radius: 50%;
+
       background: #1b6b67;
+
       opacity: 0;
     }
 
     #brand-watermark {
       position: fixed;
+
       right: 14px;
       top: 14px;
+
       z-index: 42;
+
       pointer-events: none;
-      background: transparent;
+
       color: #f7efd9;
+
       font-family: "Fredoka", sans-serif;
+
       font-weight: 600;
+
       font-size: 13px;
+
       letter-spacing: 0.3px;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55), 0 0 6px rgba(0, 0, 0, 0.35);
+
+      text-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.55),
+        0 0 6px rgba(0, 0, 0, 0.35);
+
       opacity: 0.92;
     }
+
   </style>
 </head>
 
+
 <body>
+
+  <!-- =========================
+       ENTRY SCREEN
+  ========================= -->
+
   <div id="entry-screen">
+
     <div id="entry-sunburst"></div>
-    <h1 id="entry-title">90's RADIO</h1>
-    <div id="entry-subtitle">Touch the Past, Feel the Sound</div>
-    <p id="entry-hint">Point your camera at the target, then tap below to tune in.</p>
-    <button id="entry-btn" type="button">Tap to Begin</button>
+
+    <h1 id="entry-title">
+      90's RADIO
+    </h1>
+
+    <div id="entry-subtitle">
+      Touch the Past, Feel the Sound
+    </div>
+
+    <p id="entry-hint">
+      Point your camera at the target, then tap below to tune in.
+    </p>
+
+    <button
+      id="entry-btn"
+      type="button"
+      disabled
+    >
+      Loading AR…
+    </button>
+
   </div>
 
+
+  <!-- =========================
+       SCAN HUD
+  ========================= -->
+
   <div id="scan-hud">
+
     <div id="scan-frame">
+
       <div class="corner tl"></div>
       <div class="corner tr"></div>
       <div class="corner bl"></div>
       <div class="corner br"></div>
-      <div id="scan-hint">Point at the radio target</div>
+
+      <div id="scan-hint">
+        Point at the radio target
+      </div>
+
     </div>
+
   </div>
+
+
+  <!-- =========================
+       RADIO HUD
+  ========================= -->
 
   <div id="radio-hud">
+
     <div id="radio-display">
-      <span id="freq-text">93.5 FM</span>
-      <span id="station-name">RETRO CLASSICS</span>
+
+      <span id="freq-text">
+        93.5 FM
+      </span>
+
+      <span id="station-name">
+        RETRO CLASSICS
+      </span>
+
     </div>
 
-    <div id="rotate-hint">Swipe left/right to rotate 360°</div>
+    <div id="rotate-hint">
+      Swipe left/right to rotate 360°
+    </div>
 
     <div id="controls-row">
-      <button class="radio-btn btn-small" id="prev-btn" type="button" title="Previous Station">⏮</button>
-      <button class="radio-btn btn-large" id="play-btn" type="button" title="Play">▶</button>
-      <button class="radio-btn btn-large" id="pause-btn" type="button" title="Pause">⏸</button>
-      <button class="radio-btn btn-small" id="next-btn" type="button" title="Next Station">⏭</button>
+
+      <button
+        class="radio-btn btn-small"
+        id="prev-btn"
+        type="button"
+        title="Previous Station"
+      >
+        ⏮
+      </button>
+
+      <button
+        class="radio-btn btn-large"
+        id="play-btn"
+        type="button"
+        title="Play"
+      >
+        ▶
+      </button>
+
+      <button
+        class="radio-btn btn-large"
+        id="pause-btn"
+        type="button"
+        title="Pause"
+      >
+        ⏸
+      </button>
+
+      <button
+        class="radio-btn btn-small"
+        id="next-btn"
+        type="button"
+        title="Next Station"
+      >
+        ⏭
+      </button>
+
     </div>
+
   </div>
 
+
+  <!-- =========================
+       EFFECTS
+  ========================= -->
+
   <div id="ambient-layer"></div>
-  <div id="ar-error-toast"></div>
-  <div id="brand-watermark">90&#8217;s Cafe, Khammam</div>
+
+  <div id="ar-error-toast">
+
+    <div id="error-message"></div>
+
+    <button id="error-close" type="button">
+      Try Again
+    </button>
+
+  </div>
+
+  <div id="brand-watermark">
+    90's Cafe, Khammam
+  </div>
+
+
+  <!-- =========================
+       MINDAR / A-FRAME
+  ========================= -->
 
   <a-scene
     id="ar-scene"
+
     mindar-image="
       imageTargetSrc: ./targets.mind;
       uiLoading: no;
@@ -413,339 +836,1404 @@
       uiError: no;
       autoStart: false;
     "
+
     color-space="sRGB"
+
     renderer="
       alpha: true;
       antialias: true;
       colorManagement: true;
       physicallyCorrectLights: true;
     "
+
     vr-mode-ui="enabled: false"
+
     device-orientation-permission-ui="enabled: false"
+
     embedded
   >
+
     <a-assets>
-      <a-asset-item id="radio-model" src="./GLB/radio.glb"></a-asset-item>
+
+      <a-asset-item
+        id="radio-model"
+        src="./GLB/radio.glb"
+      ></a-asset-item>
+
     </a-assets>
 
-    <a-camera position="0 0 0" look-controls="enabled: false">
-      <a-entity cursor="rayOrigin: mouse" raycaster="objects: [gltf-model]"></a-entity>
-    </a-camera>
 
-    <a-entity id="target-radio" mindar-image-target="targetIndex: 0">
-      <a-entity 
-        id="model-entity-radio" 
-        gltf-model="#radio-model" 
-        rotation="0 0 0" 
-        position="0 -0.1 0" 
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false"
+    ></a-camera>
+
+
+    <a-entity
+      id="target-radio"
+      mindar-image-target="targetIndex: 0"
+    >
+
+      <a-entity
+        id="model-entity-radio"
+
+        gltf-model="#radio-model"
+
+        rotation="0 0 0"
+
+        position="0 -0.1 0"
+
         scale="0.5 0.5 0.5"
       ></a-entity>
+
     </a-entity>
+
   </a-scene>
 
-  <script>
-    const sceneEl = document.querySelector("#ar-scene");
-    const entryScreen = document.querySelector("#entry-screen");
-    const entryBtn = document.querySelector("#entry-btn");
-    const scanHud = document.querySelector("#scan-hud");
-    const radioHud = document.querySelector("#radio-hud");
-    const errorToast = document.querySelector("#ar-error-toast");
-    const ambientLayer = document.querySelector("#ambient-layer");
 
-    const freqText = document.querySelector("#freq-text");
-    const stationName = document.querySelector("#station-name");
-    const playBtn = document.querySelector("#play-btn");
-    const pauseBtn = document.querySelector("#pause-btn");
-    const prevBtn = document.querySelector("#prev-btn");
-    const nextBtn = document.querySelector("#next-btn");
+  <!-- =========================
+       JAVASCRIPT
+  ========================= -->
+
+  <script>
+
+    /* ==========================================
+       ELEMENTS
+    ========================================== */
+
+    const sceneEl =
+      document.querySelector("#ar-scene");
+
+    const entryScreen =
+      document.querySelector("#entry-screen");
+
+    const entryBtn =
+      document.querySelector("#entry-btn");
+
+    const scanHud =
+      document.querySelector("#scan-hud");
+
+    const radioHud =
+      document.querySelector("#radio-hud");
+
+    const errorToast =
+      document.querySelector("#ar-error-toast");
+
+    const errorMessage =
+      document.querySelector("#error-message");
+
+    const errorClose =
+      document.querySelector("#error-close");
+
+    const ambientLayer =
+      document.querySelector("#ambient-layer");
+
+    const freqText =
+      document.querySelector("#freq-text");
+
+    const stationName =
+      document.querySelector("#station-name");
+
+    const playBtn =
+      document.querySelector("#play-btn");
+
+    const pauseBtn =
+      document.querySelector("#pause-btn");
+
+    const prevBtn =
+      document.querySelector("#prev-btn");
+
+    const nextBtn =
+      document.querySelector("#next-btn");
+
+    const targetEntity =
+      document.querySelector("#target-radio");
+
+    const modelEntity =
+      document.querySelector("#model-entity-radio");
+
+
+    /* ==========================================
+       STATE
+    ========================================== */
 
     const TARGET_SCALE = 0.5;
-    const targetEntity = document.querySelector("#target-radio");
-    const modelEntity = document.querySelector("#model-entity-radio");
 
     let hasStartedAR = false;
+
+    let arStarting = false;
+
     let isTargetActive = false;
 
-    // AUDIO & STATIONS STATE
+    let sceneReady = false;
+
+
+    /* ==========================================
+       AUDIO
+    ========================================== */
+
     const stations = [
-      { freq: "93.5 FM", name: "RETRO CLASSICS", src: "./1.mp3" },
-      { freq: "103.5 FM", name: "90s POP MIX", src: "./2.mp3" },
-      { freq: "104.8 FM", name: "VINTAGE GOLD", src: "./3.mp3" }
+
+      {
+        freq: "93.5 FM",
+        name: "RETRO CLASSICS",
+        src: "./1.mp3"
+      },
+
+      {
+        freq: "103.5 FM",
+        name: "90s POP MIX",
+        src: "./2.mp3"
+      },
+
+      {
+        freq: "104.8 FM",
+        name: "VINTAGE GOLD",
+        src: "./3.mp3"
+      }
+
     ];
 
+
     let currentStationIdx = 0;
-    let audioPlayer = new Audio();
+
+    const audioPlayer = new Audio();
+
     audioPlayer.loop = true;
+
     let isPlaying = false;
 
-    // AUDIO SYNTH SFX
+
+    /* ==========================================
+       AUDIO SYNTH
+    ========================================== */
+
     let audioCtx = null;
+
+
     function getAudioCtx() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      return audioCtx;
-    }
 
-    function playTone({ freq = 880, endFreq = null, duration = 0.15, type = "sine", volume = 0.2 }) {
-      try {
-        const ctx = getAudioCtx();
-        if (ctx.state === "suspended") ctx.resume();
-        const oscillator = ctx.createOscillator();
-        const gain = ctx.createGain();
+      if (!audioCtx) {
 
-        oscillator.type = type;
-        oscillator.frequency.setValueAtTime(freq, ctx.currentTime);
-        if (endFreq) oscillator.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration * 0.6);
+        const AudioContext =
+          window.AudioContext ||
+          window.webkitAudioContext;
 
-        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-
-        oscillator.connect(gain);
-        gain.connect(ctx.destination);
-        oscillator.start();
-        oscillator.stop(ctx.currentTime + duration + 0.05);
-      } catch(e) {}
-    }
-
-    const playClickSound = () => playTone({ freq: 500, endFreq: 800, duration: 0.1, type: "triangle", volume: 0.2 });
-    const playTuneSound = () => playTone({ freq: 300, endFreq: 1200, duration: 0.25, type: "sawtooth", volume: 0.15 });
-
-    // GSAP ENTRY SCREEN ANIMATIONS
-    gsap.set("#entry-title, #entry-subtitle, #entry-hint, #entry-btn", { opacity: 0 });
-    gsap.set("#entry-title", { scale: 0.7 });
-    gsap.to("#entry-sunburst", { rotate: 360, duration: 50, repeat: -1, ease: "none" });
-
-    gsap.timeline()
-      .to("#entry-title", { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.6)" }, 0.1)
-      .to("#entry-subtitle", { opacity: 1, duration: 0.4 }, 0.4)
-      .to("#entry-hint", { opacity: 1, duration: 0.4 }, 0.6)
-      .to("#entry-btn", { opacity: 1, duration: 0.4 }, 0.75);
-
-    sceneEl.addEventListener("arReady", () => {
-      errorToast.classList.remove("visible");
-    });
-
-    sceneEl.addEventListener("arError", (event) => {
-      console.error("90's MACHINE: MindAR camera error:", event.detail);
-      errorToast.textContent = "Camera could not start. Ensure camera permission is allowed.";
-      errorToast.classList.add("visible");
-    });
-
-    // START CAMERA BUTTON EVENT WITH SAFELY MANAGED LIFECYCLE
-    entryBtn.addEventListener("click", async () => {
-      if (entryBtn.disabled) return;
-
-      try {
-        const ctx = getAudioCtx();
-        if (ctx.state === "suspended") await ctx.resume();
-        playClickSound();
-
-        if (!hasStartedAR) {
-          entryBtn.disabled = true;
-          entryBtn.textContent = "Starting camera…";
-
-          // Prime WebRTC camera stream explicitly
-          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            const primingStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            primingStream.getTracks().forEach((track) => track.stop());
-          }
-
-          // Start MindAR
-          const mindarSystem = sceneEl.systems["mindar-image-system"];
-          if (mindarSystem) {
-            await mindarSystem.start();
-            hasStartedAR = true;
-          } else {
-            throw new Error("MindAR system not ready.");
-          }
+        if (!AudioContext) {
+          return null;
         }
 
-        gsap.to("#entry-screen", {
-          opacity: 0,
-          scale: 1.05,
-          duration: 0.4,
-          ease: "power1.in",
-          onComplete: () => {
-            entryScreen.classList.add("hidden");
-            if (!isTargetActive) {
-              scanHud.classList.add("visible");
-              startAmbientParticles();
-            }
-          }
-        });
+        audioCtx = new AudioContext();
+
+      }
+
+      return audioCtx;
+
+    }
+
+
+    function playTone({
+      freq = 880,
+      endFreq = null,
+      duration = 0.15,
+      type = "sine",
+      volume = 0.2
+    }) {
+
+      try {
+
+        const ctx = getAudioCtx();
+
+        if (!ctx) {
+          return;
+        }
+
+        if (ctx.state === "suspended") {
+          ctx.resume();
+        }
+
+        const oscillator =
+          ctx.createOscillator();
+
+        const gain =
+          ctx.createGain();
+
+
+        oscillator.type = type;
+
+        oscillator.frequency.setValueAtTime(
+          freq,
+          ctx.currentTime
+        );
+
+
+        if (endFreq) {
+
+          oscillator.frequency.exponentialRampToValueAtTime(
+            endFreq,
+            ctx.currentTime + duration * 0.6
+          );
+
+        }
+
+
+        gain.gain.setValueAtTime(
+          0.0001,
+          ctx.currentTime
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+          volume,
+          ctx.currentTime + 0.02
+        );
+
+
+        gain.gain.exponentialRampToValueAtTime(
+          0.0001,
+          ctx.currentTime + duration
+        );
+
+
+        oscillator.connect(gain);
+
+        gain.connect(ctx.destination);
+
+
+        oscillator.start();
+
+        oscillator.stop(
+          ctx.currentTime + duration + 0.05
+        );
+
       } catch (error) {
-        console.error("90's MACHINE: Start error:", error);
-        errorToast.textContent = "Could not open camera. Please check permissions or open in external browser (Safari/Chrome).";
-        errorToast.classList.add("visible");
+
+        console.warn(
+          "Audio tone error:",
+          error
+        );
+
+      }
+
+    }
+
+
+    function playClickSound() {
+
+      playTone({
+        freq: 500,
+        endFreq: 800,
+        duration: 0.1,
+        type: "triangle",
+        volume: 0.2
+      });
+
+    }
+
+
+    function playTuneSound() {
+
+      playTone({
+        freq: 300,
+        endFreq: 1200,
+        duration: 0.25,
+        type: "sawtooth",
+        volume: 0.15
+      });
+
+    }
+
+
+    /* ==========================================
+       ERROR HANDLING
+    ========================================== */
+
+    function showError(message) {
+
+      console.error(
+        "90's RADIO AR ERROR:",
+        message
+      );
+
+      errorMessage.innerHTML = message;
+
+      errorToast.classList.add("visible");
+
+    }
+
+
+    function hideError() {
+
+      errorToast.classList.remove("visible");
+
+    }
+
+
+    errorClose.addEventListener(
+      "click",
+      () => {
+
+        hideError();
+
         entryBtn.disabled = false;
+
         entryBtn.textContent = "Tap to Begin";
+
       }
-    });
+    );
 
-    // STATION PLAYER LOGIC
-    function loadStation(index, autoPlay = true) {
-      currentStationIdx = (index + stations.length) % stations.length;
-      const st = stations[currentStationIdx];
 
-      freqText.textContent = st.freq;
-      stationName.textContent = st.name;
+    /* ==========================================
+       CHECK BROWSER / HTTPS
+    ========================================== */
 
-      audioPlayer.src = st.src;
-      if (autoPlay && isPlaying) {
-        audioPlayer.play().catch(e => console.log("Audio play error:", e));
+    function checkCameraEnvironment() {
+
+      if (
+        location.protocol !== "https:" &&
+        location.hostname !== "localhost" &&
+        location.hostname !== "127.0.0.1"
+      ) {
+
+        showError(
+          "Camera access requires <b>HTTPS</b>.<br><br>" +
+          "Open this AR page using your HTTPS website URL."
+        );
+
+        return false;
+
       }
-    }
 
-    function playAudio() {
-      playClickSound();
-      if (!audioPlayer.src) loadStation(currentStationIdx, false);
-      audioPlayer.play().then(() => {
-        isPlaying = true;
-        playBtn.classList.add("active");
-        pauseBtn.classList.remove("active");
-      }).catch(e => console.log("Playback error:", e));
-    }
 
-    function pauseAudio() {
-      playClickSound();
-      audioPlayer.pause();
-      isPlaying = false;
-      playBtn.classList.remove("active");
-      pauseBtn.classList.add("active");
-    }
+      if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+      ) {
 
-    playBtn.addEventListener("click", playAudio);
-    pauseBtn.addEventListener("click", pauseAudio);
+        showError(
+          "This browser does not provide camera access.<br><br>" +
+          "Please open the AR page directly in <b>Chrome</b> or <b>Safari</b>."
+        );
 
-    nextBtn.addEventListener("click", () => {
-      playTuneSound();
-      loadStation(currentStationIdx + 1, isPlaying);
-    });
+        return false;
 
-    prevBtn.addEventListener("click", () => {
-      playTuneSound();
-      loadStation(currentStationIdx - 1, isPlaying);
-    });
-
-    // 360 DEGREE TOUCH ROTATION LOGIC
-    let isDragging = false;
-    let previousTouchX = 0;
-    let targetRotationY = 0;
-
-    window.addEventListener("pointerdown", (e) => {
-      if (e.target.closest("#radio-hud") || e.target.closest("#entry-screen")) return;
-      isDragging = true;
-      previousTouchX = e.clientX;
-    });
-
-    window.addEventListener("pointermove", (e) => {
-      if (!isDragging || !modelEntity || !modelEntity.object3D) return;
-      const deltaX = e.clientX - previousTouchX;
-      previousTouchX = e.clientX;
-      targetRotationY += deltaX * 0.012;
-    });
-
-    window.addEventListener("pointerup", () => { isDragging = false; });
-    window.addEventListener("pointercancel", () => { isDragging = false; });
-
-    function updateRotation() {
-      if (modelEntity && modelEntity.object3D) {
-        modelEntity.object3D.rotation.y += (targetRotationY - modelEntity.object3D.rotation.y) * 0.15;
       }
-      requestAnimationFrame(updateRotation);
-    }
-    updateRotation();
 
-    // TARGET DETECTION HANDLERS
-    function triggerModelAnimation(entity) {
-      if (!entity) return;
+
+      return true;
+
+    }
+
+
+    /* ==========================================
+       START AR
+    ========================================== */
+
+    async function startAR() {
+
+      if (arStarting || hasStartedAR) {
+        return;
+      }
+
+
+      hideError();
+
+
+      if (!checkCameraEnvironment()) {
+        return;
+      }
+
+
+      if (!sceneReady) {
+
+        showError(
+          "AR is still loading.<br><br>" +
+          "Please wait a moment and try again."
+        );
+
+        return;
+
+      }
+
+
+      arStarting = true;
+
+      entryBtn.disabled = true;
+
+      entryBtn.textContent =
+        "Starting camera…";
+
+
+      try {
+
+        /* -----------------------------
+           Resume audio
+        ----------------------------- */
+
+        const ctx = getAudioCtx();
+
+        if (
+          ctx &&
+          ctx.state === "suspended"
+        ) {
+
+          await ctx.resume();
+
+        }
+
+
+        playClickSound();
+
+
+        /* -----------------------------
+           Get MindAR system
+        ----------------------------- */
+
+        const mindarSystem =
+          sceneEl.systems[
+            "mindar-image-system"
+          ];
+
+
+        if (!mindarSystem) {
+
+          throw new Error(
+            "MindAR image system was not initialized."
+          );
+
+        }
+
+
+        /* -----------------------------
+           START MINDAR
+
+           IMPORTANT:
+           Do NOT call getUserMedia()
+           separately here.
+
+           MindAR owns the camera.
+        ----------------------------- */
+
+        await mindarSystem.start();
+
+
+        hasStartedAR = true;
+
+
+        /* -----------------------------
+           Hide entry screen
+        ----------------------------- */
+
+        gsap.to(
+          "#entry-screen",
+          {
+            opacity: 0,
+            scale: 1.05,
+            duration: 0.4,
+            ease: "power1.in",
+
+            onComplete: () => {
+
+              entryScreen.classList.add(
+                "hidden"
+              );
+
+              if (!isTargetActive) {
+
+                scanHud.classList.add(
+                  "visible"
+                );
+
+                startAmbientParticles();
+
+              }
+
+            }
+
+          }
+        );
+
+
+        console.log(
+          "90's RADIO: Camera started successfully."
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "90's RADIO: Camera start failed:",
+          error
+        );
+
+
+        let message =
+          "Could not open the camera.";
+
+
+        if (error && error.name) {
+
+          switch (error.name) {
+
+            case "NotAllowedError":
+
+              message =
+                "<b>Camera permission was denied.</b><br><br>" +
+                "Allow camera access for this website in your browser settings, then reload the page.";
+
+              break;
+
+
+            case "NotFoundError":
+
+              message =
+                "<b>No camera was found.</b><br><br>" +
+                "Make sure your device has a working camera.";
+
+              break;
+
+
+            case "NotReadableError":
+
+              message =
+                "<b>The camera is already being used.</b><br><br>" +
+                "Close other apps or browser tabs using the camera, then try again.";
+
+              break;
+
+
+            case "SecurityError":
+
+              message =
+                "<b>Browser security blocked the camera.</b><br><br>" +
+                "Open the AR page directly using HTTPS in Chrome or Safari.";
+
+              break;
+
+
+            case "AbortError":
+
+              message =
+                "<b>Camera startup was interrupted.</b><br><br>" +
+                "Try again.";
+
+              break;
+
+
+            default:
+
+              message =
+                "<b>Camera error:</b> " +
+                error.name +
+                "<br><br>" +
+                (error.message || "Unknown camera error.");
+
+          }
+
+        } else if (error && error.message) {
+
+          message =
+            "<b>AR startup error:</b><br>" +
+            error.message;
+
+        }
+
+
+        showError(message);
+
+
+        entryBtn.disabled = false;
+
+        entryBtn.textContent =
+          "Tap to Begin";
+
+
+        hasStartedAR = false;
+
+      }
+
+
+      arStarting = false;
+
+    }
+
+
+    /* ==========================================
+       BUTTON
+    ========================================== */
+
+    entryBtn.addEventListener(
+      "click",
+      startAR
+    );
+
+
+    /* ==========================================
+       A-FRAME LOADED
+    ========================================== */
+
+    sceneEl.addEventListener(
+      "loaded",
+      () => {
+
+        sceneReady = true;
+
+        entryBtn.disabled = false;
+
+        entryBtn.textContent =
+          "Tap to Begin";
+
+
+        console.log(
+          "90's RADIO: A-Frame loaded."
+        );
+
+      }
+    );
+
+
+    /* ==========================================
+       MINDAR READY
+    ========================================== */
+
+    sceneEl.addEventListener(
+      "arReady",
+      () => {
+
+        console.log(
+          "90's RADIO: MindAR ready."
+        );
+
+        hideError();
+
+      }
+    );
+
+
+    /* ==========================================
+       MINDAR ERROR
+    ========================================== */
+
+    sceneEl.addEventListener(
+      "arError",
+      (event) => {
+
+        console.error(
+          "90's RADIO: MindAR error:",
+          event
+        );
+
+
+        showError(
+          "<b>AR camera error.</b><br><br>" +
+          "Please make sure camera permission is allowed and open this page directly in Chrome or Safari."
+        );
+
+
+        entryBtn.disabled = false;
+
+        entryBtn.textContent =
+          "Tap to Begin";
+
+      }
+    );
+
+
+    /* ==========================================
+       TARGET FOUND
+    ========================================== */
+
+    targetEntity.addEventListener(
+      "targetFound",
+      () => {
+
+        console.log(
+          "90's RADIO: Target found."
+        );
+
+
+        isTargetActive = true;
+
+
+        scanHud.classList.remove(
+          "visible"
+        );
+
+
+        radioHud.classList.add(
+          "visible"
+        );
+
+
+        stopAmbientParticles();
+
+
+        if (
+          modelEntity.object3D
+        ) {
+
+          triggerModelAnimation(
+            modelEntity
+          );
+
+        } else {
+
+          modelEntity.addEventListener(
+            "model-loaded",
+            () => {
+
+              triggerModelAnimation(
+                modelEntity
+              );
+
+            },
+            {
+              once: true
+            }
+          );
+
+        }
+
+
+        loadStation(
+          currentStationIdx,
+          false
+        );
+
+      }
+    );
+
+
+    /* ==========================================
+       TARGET LOST
+    ========================================== */
+
+    targetEntity.addEventListener(
+      "targetLost",
+      () => {
+
+        console.log(
+          "90's RADIO: Target lost."
+        );
+
+
+        isTargetActive = false;
+
+
+        radioHud.classList.remove(
+          "visible"
+        );
+
+
+        pauseAudio();
+
+
+        if (
+          modelEntity &&
+          modelEntity.object3D
+        ) {
+
+          gsap.to(
+            modelEntity.object3D.scale,
+            {
+              x: 0.001,
+              y: 0.001,
+              z: 0.001,
+              duration: 0.2,
+              ease: "power1.in"
+            }
+          );
+
+        }
+
+
+        if (
+          entryScreen.classList.contains(
+            "hidden"
+          )
+        ) {
+
+          scanHud.classList.add(
+            "visible"
+          );
+
+          startAmbientParticles();
+
+        }
+
+      }
+    );
+
+
+    /* ==========================================
+       MODEL ANIMATION
+    ========================================== */
+
+    function triggerModelAnimation(
+      entity
+    ) {
+
+      if (!entity) {
+        return;
+      }
+
 
       if (entity.object3D) {
-        gsap.killTweensOf(entity.object3D.scale);
+
+        gsap.killTweensOf(
+          entity.object3D.scale
+        );
+
+
         targetRotationY = 0;
-        entity.object3D.rotation.set(0, 0, 0);
+
+
+        entity.object3D.rotation.set(
+          0,
+          0,
+          0
+        );
+
 
         gsap.fromTo(
+
           entity.object3D.scale,
-          { x: 0.001, y: 0.001, z: 0.001 },
-          { x: TARGET_SCALE, y: TARGET_SCALE, z: TARGET_SCALE, duration: 0.6, ease: "elastic.out(1, 0.55)" }
+
+          {
+            x: 0.001,
+            y: 0.001,
+            z: 0.001
+          },
+
+          {
+            x: TARGET_SCALE,
+            y: TARGET_SCALE,
+            z: TARGET_SCALE,
+
+            duration: 0.6,
+
+            ease: "elastic.out(1, 0.55)"
+          }
+
         );
+
       } else {
-        entity.setAttribute("scale", `${TARGET_SCALE} ${TARGET_SCALE} ${TARGET_SCALE}`);
+
+        entity.setAttribute(
+          "scale",
+          `${TARGET_SCALE} ${TARGET_SCALE} ${TARGET_SCALE}`
+        );
+
       }
+
     }
 
-    targetEntity.addEventListener("targetFound", () => {
-      isTargetActive = true;
-      scanHud.classList.remove("visible");
-      radioHud.classList.add("visible");
-      stopAmbientParticles();
-      
-      if (modelEntity.hasLoaded) {
-        triggerModelAnimation(modelEntity);
-      } else {
-        modelEntity.addEventListener("model-loaded", () => triggerModelAnimation(modelEntity), { once: true });
+
+    /* ==========================================
+       RADIO PLAYER
+    ========================================== */
+
+    function loadStation(
+      index,
+      autoPlay = true
+    ) {
+
+      currentStationIdx =
+        (index + stations.length) %
+        stations.length;
+
+
+      const station =
+        stations[currentStationIdx];
+
+
+      freqText.textContent =
+        station.freq;
+
+
+      stationName.textContent =
+        station.name;
+
+
+      audioPlayer.src =
+        station.src;
+
+
+      if (
+        autoPlay &&
+        isPlaying
+      ) {
+
+        audioPlayer
+          .play()
+          .catch(
+            error => {
+
+              console.warn(
+                "Audio play error:",
+                error
+              );
+
+            }
+          );
+
       }
 
-      loadStation(currentStationIdx, false);
-    });
+    }
 
-    targetEntity.addEventListener("targetLost", () => {
-      isTargetActive = false;
-      radioHud.classList.remove("visible");
-      pauseAudio();
 
-      if (modelEntity && modelEntity.object3D) {
-        gsap.to(modelEntity.object3D.scale, {
-          x: 0.001, y: 0.001, z: 0.001,
-          duration: 0.2,
-          ease: "power1.in"
+    function playAudio() {
+
+      playClickSound();
+
+
+      if (!audioPlayer.src) {
+
+        loadStation(
+          currentStationIdx,
+          false
+        );
+
+      }
+
+
+      audioPlayer
+        .play()
+        .then(() => {
+
+          isPlaying = true;
+
+          playBtn.classList.add(
+            "active"
+          );
+
+          pauseBtn.classList.remove(
+            "active"
+          );
+
+        })
+        .catch(error => {
+
+          console.warn(
+            "Playback error:",
+            error
+          );
+
         });
+
+    }
+
+
+    function pauseAudio() {
+
+      playClickSound();
+
+
+      audioPlayer.pause();
+
+
+      isPlaying = false;
+
+
+      playBtn.classList.remove(
+        "active"
+      );
+
+
+      pauseBtn.classList.add(
+        "active"
+      );
+
+    }
+
+
+    playBtn.addEventListener(
+      "click",
+      playAudio
+    );
+
+
+    pauseBtn.addEventListener(
+      "click",
+      pauseAudio
+    );
+
+
+    nextBtn.addEventListener(
+      "click",
+      () => {
+
+        playTuneSound();
+
+
+        loadStation(
+          currentStationIdx + 1,
+          isPlaying
+        );
+
+      }
+    );
+
+
+    prevBtn.addEventListener(
+      "click",
+      () => {
+
+        playTuneSound();
+
+
+        loadStation(
+          currentStationIdx - 1,
+          isPlaying
+        );
+
+      }
+    );
+
+
+    /* ==========================================
+       360° MODEL ROTATION
+    ========================================== */
+
+    let isDragging = false;
+
+    let previousTouchX = 0;
+
+    let targetRotationY = 0;
+
+
+    window.addEventListener(
+      "pointerdown",
+      event => {
+
+        if (
+          event.target.closest(
+            "#radio-hud"
+          )
+        ) {
+
+          return;
+
+        }
+
+
+        if (
+          event.target.closest(
+            "#entry-screen"
+          )
+        ) {
+
+          return;
+
+        }
+
+
+        isDragging = true;
+
+        previousTouchX =
+          event.clientX;
+
+      }
+    );
+
+
+    window.addEventListener(
+      "pointermove",
+      event => {
+
+        if (
+          !isDragging ||
+          !modelEntity ||
+          !modelEntity.object3D
+        ) {
+
+          return;
+
+        }
+
+
+        const deltaX =
+          event.clientX -
+          previousTouchX;
+
+
+        previousTouchX =
+          event.clientX;
+
+
+        targetRotationY +=
+          deltaX * 0.012;
+
+      }
+    );
+
+
+    window.addEventListener(
+      "pointerup",
+      () => {
+
+        isDragging = false;
+
+      }
+    );
+
+
+    window.addEventListener(
+      "pointercancel",
+      () => {
+
+        isDragging = false;
+
+      }
+    );
+
+
+    function updateRotation() {
+
+      if (
+        modelEntity &&
+        modelEntity.object3D
+      ) {
+
+        modelEntity.object3D.rotation.y +=
+          (
+            targetRotationY -
+            modelEntity.object3D.rotation.y
+          ) * 0.15;
+
       }
 
-      if (entryScreen.classList.contains("hidden")) {
-        scanHud.classList.add("visible");
-        startAmbientParticles();
-      }
-    });
 
-    // AMBIENT PARTICLES
+      requestAnimationFrame(
+        updateRotation
+      );
+
+    }
+
+
+    updateRotation();
+
+
+    /* ==========================================
+       AMBIENT PARTICLES
+    ========================================== */
+
     let ambientTimer = null;
 
+
     function spawnAmbientDot() {
-      const dot = document.createElement("div");
-      dot.className = "ambient-dot";
 
-      const x = window.innerWidth * (0.3 + Math.random() * 0.4);
-      const startY = window.innerHeight * 0.75;
-      dot.style.left = `${x}px`;
-      dot.style.top = `${startY}px`;
-      ambientLayer.appendChild(dot);
+      const dot =
+        document.createElement(
+          "div"
+        );
 
-      gsap.timeline({ onComplete: () => dot.remove() })
-        .to(dot, { opacity: 0.6, duration: 0.4 }, 0)
-        .to(dot, { y: -180 - Math.random() * 100, x: `+=${(Math.random() - 0.5) * 60}`, duration: 2.4, ease: "power1.out" }, 0)
-        .to(dot, { opacity: 0, duration: 0.5 }, 1.9);
+
+      dot.className =
+        "ambient-dot";
+
+
+      const x =
+        window.innerWidth *
+        (0.3 + Math.random() * 0.4);
+
+
+      const startY =
+        window.innerHeight * 0.75;
+
+
+      dot.style.left =
+        `${x}px`;
+
+
+      dot.style.top =
+        `${startY}px`;
+
+
+      ambientLayer.appendChild(
+        dot
+      );
+
+
+      gsap.timeline({
+
+        onComplete: () => {
+
+          dot.remove();
+
+        }
+
+      })
+
+      .to(
+        dot,
+        {
+          opacity: 0.6,
+          duration: 0.4
+        },
+        0
+      )
+
+      .to(
+        dot,
+        {
+          y:
+            -180 -
+            Math.random() * 100,
+
+          x:
+            `+=${(Math.random() - 0.5) * 60}`,
+
+          duration: 2.4,
+
+          ease: "power1.out"
+        },
+        0
+      )
+
+      .to(
+        dot,
+        {
+          opacity: 0,
+          duration: 0.5
+        },
+        1.9
+      );
+
     }
+
 
     function startAmbientParticles() {
-      if (ambientTimer) return;
+
+      if (ambientTimer) {
+        return;
+      }
+
+
       spawnAmbientDot();
-      ambientTimer = window.setInterval(spawnAmbientDot, 700);
+
+
+      ambientTimer =
+        window.setInterval(
+          spawnAmbientDot,
+          700
+        );
+
     }
+
 
     function stopAmbientParticles() {
+
       if (ambientTimer) {
-        window.clearInterval(ambientTimer);
+
+        window.clearInterval(
+          ambientTimer
+        );
+
         ambientTimer = null;
+
       }
+
     }
 
-    sceneEl.addEventListener("loaded", () => {
-      if (modelEntity) {
-        modelEntity.setAttribute("scale", "0.001 0.001 0.001");
+
+    /* ==========================================
+       MODEL INITIAL STATE
+    ========================================== */
+
+    sceneEl.addEventListener(
+      "loaded",
+      () => {
+
+        if (
+          modelEntity &&
+          modelEntity.object3D
+        ) {
+
+          modelEntity.object3D.scale.set(
+            0.001,
+            0.001,
+            0.001
+          );
+
+        }
+
       }
-    });
+    );
+
+
+    /* ==========================================
+       INITIAL UI ANIMATION
+    ========================================== */
+
+    gsap.set(
+      "#entry-title, #entry-subtitle, #entry-hint, #entry-btn",
+      {
+        opacity: 0
+      }
+    );
+
+
+    gsap.set(
+      "#entry-title",
+      {
+        scale: 0.7
+      }
+    );
+
+
+    gsap.to(
+      "#entry-sunburst",
+      {
+        rotate: 360,
+        duration: 50,
+        repeat: -1,
+        ease: "none"
+      }
+    );
+
+
+    gsap.timeline()
+
+      .to(
+        "#entry-title",
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.6,
+          ease: "back.out(1.6)"
+        },
+        0.1
+      )
+
+      .to(
+        "#entry-subtitle",
+        {
+          opacity: 1,
+          duration: 0.4
+        },
+        0.4
+      )
+
+      .to(
+        "#entry-hint",
+        {
+          opacity: 1,
+          duration: 0.4
+        },
+        0.6
+      )
+
+      .to(
+        "#entry-btn",
+        {
+          opacity: 1,
+          duration: 0.4
+        },
+        0.75
+      );
+
   </script>
+
 </body>
 </html>
