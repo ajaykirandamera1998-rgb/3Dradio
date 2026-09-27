@@ -9,9 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
 
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <!-- STABLE LIBRARIES (A-Frame 1.4.2 + MindAR 1.2.2) -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
   <style>
@@ -200,7 +201,7 @@
       white-space: nowrap;
     }
 
-    /* RADIO PLAYER DECK HUD (Non-Overlapping Bottom Panel) */
+    /* RADIO PLAYER HUD */
     #radio-hud {
       position: fixed;
       bottom: 20px;
@@ -226,7 +227,7 @@
       opacity: 1; 
     }
 
-    /* RADIO DIGITAL FREQUENCY DISPLAY */
+    /* RADIO DIGITAL DISPLAY */
     #radio-display {
       width: 100%;
       background: #0f1912;
@@ -264,7 +265,7 @@
       margin: -2px 0 2px 0;
     }
 
-    /* CONTROLS BUTTON ROW */
+    /* CONTROLS ROW */
     #controls-row {
       display: flex;
       align-items: center;
@@ -383,14 +384,13 @@
     </div>
   </div>
 
-  <!-- NON-OVERLAPPING RADIO CONTROLS BOTTOM HUD -->
   <div id="radio-hud">
     <div id="radio-display">
       <span id="freq-text">93.5 FM</span>
-      <span id="station-name">RETRO HITS</span>
+      <span id="station-name">RETRO CLASSICS</span>
     </div>
 
-    <div id="rotate-hint"> Swipe left/right to rotate 360°</div>
+    <div id="rotate-hint">Swipe left/right to rotate 360°</div>
 
     <div id="controls-row">
       <button class="radio-btn btn-small" id="prev-btn" type="button" title="Previous Station">⏮</button>
@@ -432,7 +432,6 @@
       <a-entity cursor="rayOrigin: mouse" raycaster="objects: [gltf-model]"></a-entity>
     </a-camera>
 
-    <!-- Target for Radio -->
     <a-entity id="target-radio" mindar-image-target="targetIndex: 0">
       <a-entity 
         id="model-entity-radio" 
@@ -479,7 +478,7 @@
     audioPlayer.loop = true;
     let isPlaying = false;
 
-    // AUDIO SYNTH SFX FOR UI FEEDBACK
+    // AUDIO SYNTH SFX
     let audioCtx = null;
     function getAudioCtx() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -511,7 +510,7 @@
     const playClickSound = () => playTone({ freq: 500, endFreq: 800, duration: 0.1, type: "triangle", volume: 0.2 });
     const playTuneSound = () => playTone({ freq: 300, endFreq: 1200, duration: 0.25, type: "sawtooth", volume: 0.15 });
 
-    // GSAP ENTRY SCREEN
+    // GSAP ENTRY SCREEN ANIMATIONS
     gsap.set("#entry-title, #entry-subtitle, #entry-hint, #entry-btn", { opacity: 0 });
     gsap.set("#entry-title", { scale: 0.7 });
     gsap.to("#entry-sunburst", { rotate: 360, duration: 50, repeat: -1, ease: "none" });
@@ -528,10 +527,11 @@
 
     sceneEl.addEventListener("arError", (event) => {
       console.error("90's MACHINE: MindAR camera error:", event.detail);
-      errorToast.textContent = "Camera could not start. Ensure camera permission is granted and running via HTTPS.";
+      errorToast.textContent = "Camera could not start. Ensure camera permission is allowed.";
       errorToast.classList.add("visible");
     });
 
+    // START CAMERA BUTTON EVENT WITH SAFELY MANAGED LIFECYCLE
     entryBtn.addEventListener("click", async () => {
       if (entryBtn.disabled) return;
 
@@ -544,15 +544,19 @@
           entryBtn.disabled = true;
           entryBtn.textContent = "Starting camera…";
 
+          // Prime WebRTC camera stream explicitly
           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            const primingStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const primingStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
             primingStream.getTracks().forEach((track) => track.stop());
           }
 
+          // Start MindAR
           const mindarSystem = sceneEl.systems["mindar-image-system"];
           if (mindarSystem) {
             await mindarSystem.start();
             hasStartedAR = true;
+          } else {
+            throw new Error("MindAR system not ready.");
           }
         }
 
@@ -571,7 +575,7 @@
         });
       } catch (error) {
         console.error("90's MACHINE: Start error:", error);
-        errorToast.textContent = "Could not open camera. Allow camera permissions and reload.";
+        errorToast.textContent = "Could not open camera. Please check permissions or open in external browser (Safari/Chrome).";
         errorToast.classList.add("visible");
         entryBtn.disabled = false;
         entryBtn.textContent = "Tap to Begin";
@@ -623,13 +627,12 @@
       loadStation(currentStationIdx - 1, isPlaying);
     });
 
-    // 360 DEGREE FINGER SCROLL / TOUCH ROTATION LOGIC (SKETCHFAB STYLE)
+    // 360 DEGREE TOUCH ROTATION LOGIC
     let isDragging = false;
     let previousTouchX = 0;
     let targetRotationY = 0;
 
     window.addEventListener("pointerdown", (e) => {
-      // Prevent drag initiation if clicking interactive UI controls
       if (e.target.closest("#radio-hud") || e.target.closest("#entry-screen")) return;
       isDragging = true;
       previousTouchX = e.clientX;
@@ -639,15 +642,12 @@
       if (!isDragging || !modelEntity || !modelEntity.object3D) return;
       const deltaX = e.clientX - previousTouchX;
       previousTouchX = e.clientX;
-
-      // Sensitivity factor for 360 rotation
       targetRotationY += deltaX * 0.012;
     });
 
     window.addEventListener("pointerup", () => { isDragging = false; });
     window.addEventListener("pointercancel", () => { isDragging = false; });
 
-    // Smooth render rotation update loop
     function updateRotation() {
       if (modelEntity && modelEntity.object3D) {
         modelEntity.object3D.rotation.y += (targetRotationY - modelEntity.object3D.rotation.y) * 0.15;
@@ -656,7 +656,7 @@
     }
     updateRotation();
 
-    // MODEL ANIMATION & AR TARGET HANDLERS
+    // TARGET DETECTION HANDLERS
     function triggerModelAnimation(entity) {
       if (!entity) return;
 
@@ -709,7 +709,7 @@
       }
     });
 
-    // AMBIENT BACKGROUND PARTICLES
+    // AMBIENT PARTICLES
     let ambientTimer = null;
 
     function spawnAmbientDot() {
